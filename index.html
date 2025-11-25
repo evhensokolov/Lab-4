@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PixelFlow - Агентство Графічного Дизайну | Інтерактив</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Isotope CDN (for Masonry/Filtering) -->
+    <script src="https://unpkg.com/isotope-layout@3/dist/isotope.pkgd.min.js"></script>
+    
+    <style>
+        /* Налаштування шрифту та акцентного кольору */
+        html { scroll-behavior: smooth; font-family: 'Inter', sans-serif; }
+        .accent-color { color: #00bcd4; }
+        .bg-accent { background-color: #00bcd4; }
+        .hover-accent:hover { background-color: #0097a7; }
+
+        /* Стилі для Masonry/Isotope */
+        .portfolio-grid {
+            margin: 0 auto;
+        }
+        .grid-sizer, .portfolio-item {
+            width: 100%; 
+        }
+        .portfolio-item {
+            margin-bottom: 16px;
+            /* Додано transform для Isotope transition */
+            transition: transform 0.4s ease, opacity 0.4s ease, width 0.4s ease, height 0.4s ease;
+            cursor: pointer;
+            border-radius: 0.75rem; 
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Адаптивність сітки */
+        @media (min-width: 640px) {
+            .grid-sizer, .portfolio-item { width: calc(50% - 8px); }
+        }
+        @media (min-width: 1024px) {
+            .grid-sizer, .portfolio-item { width: calc(33.333% - 10.66px); }
+        }
+        
+        /* Стилі для Hover ефектів */
+        .portfolio-item img {
+            transition: transform 0.5s ease;
+        }
+        .portfolio-item:hover img {
+            transform: scale(1.05);
+        }
+        .item-overlay {
+            opacity: 0; /* Приховано за замовчуванням */
+            transition: opacity 0.5s ease;
+        }
+        .portfolio-item:hover .item-overlay {
+            opacity: 100 !important;
+        }
+
+        /* Стилі для Scroll Animations (зроблено більш агресивними) */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(40px); /* Більший зсув для помітності */
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+            will-change: opacity, transform; /* Оптимізація анімації */
+        }
+        .animate-fadeInUp {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Стилі для Lightbox */
+        .lightbox-modal {
+            background-color: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Приховання кроків форми */
+        .brief-step:not(.active-step) {
+            display: none;
+        }
+
+        /* Стиль для активних кнопок фільтрації */
+        .filter-btn.active, .tag-btn.active {
+             /* Використовуємо класи Tailwind для активного стану, які встановлюються JS */
+        }
+    </style>
+</head>
+<body class="text-gray-900 bg-white">
+    
+    <!-- Навігація -->
+    <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-sm shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="#" class="text-2xl font-black accent-color">PixelFlow</a>
+                <div class="flex space-x-6 text-sm font-medium">
+                    <a href="#portfolio" class="hover:text-gray-600 transition">Портфоліо</a>
+                    <a href="#team" class="hover:text-gray-600 transition">Команда</a>
+                    <a href="#contact" class="px-4 py-2 rounded-full bg-gray-900 text-white hover-accent transition duration-300 shadow-xl">Контакти</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="hero" class="py-32 md:py-48 bg-white overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center animate-on-scroll">
+            <p class="text-xl font-medium text-gray-500 mb-6 uppercase tracking-widest">Створюємо не просто дизайн, а візуальну силу</p>
+            <h1 class="text-6xl md:text-8xl font-black leading-tight mb-8">
+                Мистецтво бренду
+                <br>
+                <span class="accent-color">в кожному пікселі.</span>
+            </h1>
+            <a href="#contact" class="inline-block px-10 py-4 text-lg font-semibold rounded-full bg-gray-900 text-white hover-accent transition duration-300 shadow-xl">
+                Залишити бриф
+            </a>
+        </div>
+    </section>
+
+    <!-- Портфоліо -->
+    <section id="portfolio" class="py-24 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-4xl font-bold text-center mb-4 animate-on-scroll">Вибрані Проекти</h2>
+            <p class="text-xl text-gray-500 text-center max-w-2xl mx-auto mb-16 animate-on-scroll">
+                Наші роботи — це поєднання креативності, стратегії та ідеального виконання.
+            </p>
+
+            <!-- Кнопки фільтрації за категоріями -->
+            <!-- Видалені початкові класи 'active' та кольори, вони будуть встановлені JS -->
+            <div id="category-filters" class="flex flex-wrap justify-center gap-3 mb-8 animate-on-scroll">
+                <button data-filter="*" class="filter-btn px-5 py-2 rounded-full font-medium transition">Усі</button>
+                <button data-filter=".web" class="filter-btn px-5 py-2 rounded-full font-medium transition">Веб</button>
+                <button data-filter=".mobile" class="filter-btn px-5 py-2 rounded-full font-medium transition">Мобільний</button>
+                <button data-filter=".branding" class="filter-btn px-5 py-2 rounded-full font-medium transition">Брендинг</button>
+            </div>
+
+            <!-- Фільтрація за тегами -->
+             <div id="tag-filters" class="flex flex-wrap justify-center gap-2 mb-16 animate-on-scroll">
+                <!-- Теги будуть додані динамічно -->
+            </div>
+
+            <!-- Сітка Портфоліо (Isotope Container) -->
+            <div class="portfolio-grid max-w-6xl mx-auto flex flex-wrap -mx-2">
+                <div class="grid-sizer"></div>
+                <!-- Елементи портфоліо будуть додані тут JS -->
+            </div>
+        </div>
+    </section>
+    
+    <!-- Команда (мінімально) -->
+    <section id="team" class="py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-4xl font-bold text-center mb-4 animate-on-scroll">Наші Креатори</h2>
+            <p class="text-xl text-gray-500 text-center max-w-2xl mx-auto mb-16 animate-on-scroll">
+                Познайомтеся з командою, яка перетворює ідеї на візуальні шедеври.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10 text-center">
+                <!-- Член команди 1 -->
+                <div class="animate-on-scroll">
+                    <img src="https://placehold.co/200x200/e0e0e0/00bcd4?text=Арт+Директор" alt="John Doe" class="w-48 h-48 rounded-full mx-auto mb-4 object-cover border-4 border-accent shadow-lg">
+                    <h3 class="text-xl font-bold">Іван Коваль</h3>
+                    <p class="text-gray-600 mb-3">Арт-директор, Логотип-гуру</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Контактна форма (Багатокрокова форма брифу) -->
+    <section id="contact" class="py-24 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-4xl font-bold text-center mb-4 animate-on-scroll">Залишити Бриф</h2>
+            <p class="text-xl text-gray-500 text-center max-w-2xl mx-auto mb-16 animate-on-scroll">
+                Пройдіть три прості кроки, щоб розпочати обговорення вашого проекту.
+            </p>
+
+            <div class="max-w-3xl mx-auto bg-white p-8 md:p-12 rounded-xl shadow-2xl border-t-4 border-accent animate-on-scroll">
+                
+                <!-- Індикатор Прогресу -->
+                <div class="flex justify-between mb-8 text-center relative after:absolute after:inset-x-0 after:top-1/2 after:-translate-y-1/2 after:h-0.5 after:bg-gray-200 after:z-0">
+                    <div class="w-1/3 z-10">
+                        <div id="step-indicator-1" class="w-10 h-10 mx-auto rounded-full bg-accent text-white flex items-center justify-center font-bold transition-all duration-300 mb-2">1</div>
+                        <span class="text-sm font-medium text-gray-900">Проект</span>
+                    </div>
+                    <div class="w-1/3 z-10">
+                        <div id="step-indicator-2" class="w-10 h-10 mx-auto rounded-full bg-gray-300 text-white flex items-center justify-center font-bold transition-all duration-300 mb-2">2</div>
+                        <span class="text-sm font-medium text-gray-500">Бюджет</span>
+                    </div>
+                    <div class="w-1/3 z-10">
+                        <div id="step-indicator-3" class="w-10 h-10 mx-auto rounded-full bg-gray-300 text-white flex items-center justify-center font-bold transition-all duration-300 mb-2">3</div>
+                        <span class="text-sm font-medium text-gray-500">Контакти</span>
+                    </div>
+                </div>
+
+                <form id="briefForm" onsubmit="event.preventDefault();">
+                    
+                    <!-- Крок 1: Тип Проекту -->
+                    <div id="step-1" class="brief-step active-step transition-all duration-500 ease-in-out">
+                        <h3 class="text-2xl font-bold mb-6 text-center">Крок 1: Що потрібно створити?</h3>
+                        <div class="space-y-4">
+                            <label class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition">
+                                <input type="radio" name="projectType" value="Веб-сайт/UX/UI" required class="w-4 h-4 accent-color">
+                                <span class="ml-3 font-medium text-gray-700">Веб-сайт / UX/UI</span>
+                            </label>
+                            <label class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition">
+                                <input type="radio" name="projectType" value="Брендинг/Логотип" class="w-4 h-4 accent-color">
+                                <span class="ml-3 font-medium text-gray-700">Брендинг / Логотип / Корп. Стиль</span>
+                            </label>
+                            <label class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition">
+                                <input type="radio" name="projectType" value="Мобільний Додаток" class="w-4 h-4 accent-color">
+                                <span class="ml-3 font-medium text-gray-700">Мобільний Додаток (iOS/Android)</span>
+                            </label>
+                        </div>
+                        <div class="mt-8 flex justify-end">
+                            <button type="button" onclick="nextStep(1)" class="px-8 py-3 bg-gray-900 text-white rounded-lg hover-accent transition">Далі</button>
+                        </div>
+                    </div>
+
+                    <!-- Крок 2: Бюджет -->
+                    <div id="step-2" class="brief-step transition-all duration-500 ease-in-out">
+                        <h3 class="text-2xl font-bold mb-6 text-center">Крок 2: Очікуваний Бюджет</h3>
+                        <div class="space-y-4">
+                            <label class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition">
+                                <input type="radio" name="budget" value="500$-2000$" required class="w-4 h-4 accent-color">
+                                <span class="ml-3 font-medium text-gray-700">Економ (до 2000$)</span>
+                            </label>
+                            <label class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition">
+                                <input type="radio" name="budget" value="2000$-5000$" class="w-4 h-4 accent-color">
+                                <span class="ml-3 font-medium text-gray-700">Стандарт (2000$ - 5000$)</span>
+                            </label>
+                            <label class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition">
+                                <input type="radio" name="budget" value="5000$+" class="w-4 h-4 accent-color">
+                                <span class="ml-3 font-medium text-gray-700">Преміум (від 5000$+)</span>
+                            </label>
+                        </div>
+                        <div class="mt-8 flex justify-between">
+                            <button type="button" onclick="prevStep(2)" class="px-8 py-3 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">Назад</button>
+                            <button type="button" onclick="nextStep(2)" class="px-8 py-3 bg-gray-900 text-white rounded-lg hover-accent transition">Далі</button>
+                        </div>
+                    </div>
+
+                    <!-- Крок 3: Контактна Інформація -->
+                    <div id="step-3" class="brief-step transition-all duration-500 ease-in-out">
+                        <h3 class="text-2xl font-bold mb-6 text-center">Крок 3: Ваші Контакти</h3>
+                        <div class="space-y-6">
+                            <div>
+                                <label for="contactName" class="block text-sm font-medium text-gray-700 mb-1">Ваше Ім'я</label>
+                                <input type="text" id="contactName" name="contactName" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-accent focus:border-accent transition">
+                            </div>
+                            <div>
+                                <label for="contactEmail" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                <input type="email" id="contactEmail" name="contactEmail" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-accent focus:border-accent transition">
+                            </div>
+                            <div>
+                                <label for="details" class="block text-sm font-medium text-gray-700 mb-1">Додаткові Деталі Проекту</label>
+                                <textarea id="details" name="details" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-accent focus:border-accent transition"></textarea>
+                            </div>
+                        </div>
+                        
+                        <div id="form-message" class="p-4 rounded-lg mb-4 hidden mt-6" role="alert"></div>
+
+                        <div class="mt-8 flex justify-between">
+                            <button type="button" onclick="prevStep(3)" class="px-8 py-3 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">Назад</button>
+                            <button type="button" onclick="submitBrief()" class="px-8 py-3 bg-accent text-white rounded-lg hover:bg-[#0097a7] transition">Надіслати Бриф</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Lightbox Modal -->
+    <div id="lightbox" class="lightbox-modal fixed inset-0 z-50 flex items-center justify-center p-4 transition-opacity duration-300 opacity-0 pointer-events-none">
+        <!-- Контейнер зображення та інформації -->
+        <div id="lightbox-content" class="relative w-full max-w-4xl mx-auto h-full max-h-[90vh] flex flex-col md:flex-row bg-white rounded-xl overflow-hidden shadow-2xl transform scale-95 transition-transform duration-300">
+            
+            <!-- Медіа (Зображення) -->
+            <div id="lightbox-image-container" class="md:w-3/5 h-1/2 md:h-full bg-gray-100 flex items-center justify-center overflow-hidden">
+                <img id="lightbox-image" src="" alt="Деталь проекту" class="max-h-full max-w-full object-contain">
+            </div>
+
+            <!-- Деталі Проекту -->
+            <div id="lightbox-details" class="md:w-2/5 p-6 md:p-8 overflow-y-auto">
+                <h3 id="lb-title" class="text-3xl font-bold mb-4">Назва Проекту</h3>
+                <p id="lb-description" class="text-gray-600 mb-6"></p>
+                
+                <div class="space-y-3 text-sm">
+                    <p><strong class="font-semibold">Клієнт:</strong> <span id="lb-client"></span></p>
+                    <p><strong class="font-semibold">Рік:</strong> <span id="lb-year"></span></p>
+                    <p><strong class="font-semibold">Категорія:</strong> <span id="lb-category" class="inline-block px-3 py-1 bg-accent/10 text-accent rounded-full text-xs font-semibold"></span></p>
+                    <p><strong class="font-semibold">Результати:</strong> <span id="lb-results"></span></p>
+                    <p><strong class="font-semibold">Теги:</strong> <span id="lb-tags"></span></p>
+                </div>
+
+                <a id="lb-link" href="#contact" class="mt-8 inline-flex items-center text-sm font-semibold accent-color hover:underline transition">
+                    Замовити подібний проект 
+                    <i data-lucide="arrow-right" class="w-4 h-4 ml-2"></i>
+                </a>
+            </div>
+            
+            <!-- Кнопка закриття -->
+            <button onclick="closeLightbox()" class="absolute top-4 right-4 md:-right-12 md:top-4 w-10 h-10 rounded-full bg-white md:bg-gray-900/50 text-gray-900 md:text-white flex items-center justify-center shadow-lg hover:opacity-80 transition z-50" title="Закрити (Esc)">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <!-- Навігація Lightbox -->
+        <button id="nav-prev" onclick="navigateLightbox(-1)" class="absolute left-4 z-50 p-3 rounded-full bg-white/10 text-white hover:bg-white/30 transition hidden md:block" title="Попередній">
+            <i data-lucide="chevron-left" class="w-6 h-6"></i>
+        </button>
+        <button id="nav-next" onclick="navigateLightbox(1)" class="absolute right-4 z-50 p-3 rounded-full bg-white/10 text-white hover:bg-white/30 transition hidden md:block" title="Наступний">
+            <i data-lucide="chevron-right" class="w-6 h-6"></i>
+        </button>
+    </div>
+
+    <!-- Футер -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <a href="#" class="text-3xl font-black accent-color">PixelFlow</a>
+            <p class="text-gray-500 text-sm mt-4">&copy; 2024 PixelFlow. Усі права захищено. Створено з пристрастю до дизайну.</p>
+        </div>
+    </footer>
+
+    <script>
+        // --- ДАНІ (Імітація works.json) ---
+        const worksData = [
+            { id: 1, title: "Редизайн е-commerce", category: "web", tags: ["UI/UX", "брендинг", "e-commerce"], client: "TechShop", year: 2024, image: "https://placehold.co/800x600/00bcd4/ffffff?text=Web+UI+2024", thumbnail: "https://placehold.co/400x300/00bcd4/ffffff?text=Web+UI", description: "Повний редизайн інтерфейсу та досвіду користувача для збільшення конверсії та покращення сприйняття бренду.", results: "Конверсія +45%" },
+            { id: 2, title: "Корпоративний Брендинг", category: "branding", tags: ["логотип", "фірмовий_стиль"], client: "Finance Corp", year: 2023, image: "https://placehold.co/800x1200/9b59b6/ffffff?text=Branding+2023", thumbnail: "https://placehold.co/400x600/9b59b6/ffffff?text=Брендинг", description: "Розробка нової візуальної ідентичності та гайдлайнів для великої фінансової установи.", results: "Покращення впізнаваності на 30%" },
+            { id: 3, title: "Мобільний Додаток Fitness", category: "mobile", tags: ["UI/UX", "мобільний"], client: "FitLife", year: 2024, image: "https://placehold.co/800x600/2ecc71/ffffff?text=Mobile+App", thumbnail: "https://placehold.co/400x300/2ecc71/ffffff?text=Мобільний", description: "Створення чистого та функціонального інтерфейсу для мобільного трекінгового додатку.", results: "4.8/5.0 середній рейтинг у Store" },
+            { id: 4, title: "Промо Лендінг", category: "web", tags: ["лендінг", "маркетинг"], client: "Startup Z", year: 2024, image: "https://placehold.co/800x1000/e67e22/ffffff?text=Landing+Page", thumbnail: "https://placehold.co/400x500/e67e22/ffffff?text=Лендінг", description: "Висококонверсійний дизайн односторінкового сайту для запуску нового продукту.", results: "Показник відмов -15%" },
+            { id: 5, title: "Упаковка для Кави", category: "branding", tags: ["упаковка", "ілюстрація"], client: "Coffee Hub", year: 2023, image: "https://placehold.co/800x800/f1c40f/ffffff?text=Packaging", thumbnail: "https://placehold.co/400x400/f1c40f/ffffff?text=Упаковка", description: "Розробка дизайну упаковки, що виділяється, з унікальними ілюстраціями.", results: "Збільшення продажів у рітейлі" },
+            { id: 6, title: "Веб-сервіс Аналітики", category: "web", tags: ["дашборд", "UI/UX", "web"], client: "DataFlow", year: 2024, image: "https://placehold.co/800x600/3498db/ffffff?text=Dashboard+UI", thumbnail: "https://placehold.co/400x300/3498db/ffffff?text=Дашборд", description: "Створення складного дашборду для візуалізації великих даних, з акцентом на зручності.", results: "Зниження часу на аналіз даних" },
+        ];
+
+        // --- ГЛОБАЛЬНИЙ СТАН ---
+        let iso = null; 
+        let currentCategory = '*'; 
+        let activeTags = []; 
+        let currentWorkId = null; 
+
+        // --- ФУНКЦІЇ ДЛЯ ISOTOPE ТА ПОРТФОЛІО ---
+
+        /**
+         * Рендерить елементи портфоліо та ініціалізує Isotope.
+         */
+        function initializePortfolio() {
+            const grid = document.querySelector('.portfolio-grid');
+            if (!grid) return;
+            
+            console.log('Ініціалізація портфоліо...');
+
+            // 1. Рендеринг елементів
+            renderPortfolioItems(grid);
+
+            // 2. Ініціалізація Isotope
+            iso = new Isotope(grid, {
+                itemSelector: '.portfolio-item',
+                layoutMode: 'masonry',
+                percentPosition: true,
+                masonry: {
+                    columnWidth: '.grid-sizer'
+                },
+                getSortData: {
+                    category: '[data-category]'
+                },
+                filter: '*' 
+            });
+            
+            // 3. Рендеринг тегів
+            renderTagFilters();
+            
+            // 4. Встановлення початкового активного фільтра
+            setCategoryFilter('*'); 
+
+            // 5. Ініціалізація іконок
+            lucide.createIcons();
+            
+            console.log('Isotope ініціалізовано.');
+        }
+
+        /**
+         * Створює HTML для кожного елемента портфоліо.
+         * @param {HTMLElement} grid - Контейнер для елементів.
+         */
+        function renderPortfolioItems(grid) {
+            grid.innerHTML = '<div class="grid-sizer"></div>'; 
+            worksData.forEach(work => {
+                // Заміна небезпечних символів для CSS класів
+                const tagsClasses = work.tags.map(tag => `tag-${tag.toLowerCase().replace(/[^a-z0-9]/g, '_')}`).join(' ');
+                
+                const item = document.createElement('div');
+                // Використовуємо клас 'portfolio-item' для Isotope
+                item.className = `portfolio-item ${work.category} ${tagsClasses} animate-on-scroll`;
+                item.setAttribute('data-category', work.category);
+                item.setAttribute('data-id', work.id);
+                item.onclick = () => openLightbox(work.id);
+
+                item.innerHTML = `
+                    <div class="relative w-full h-full">
+                        <!-- Зроблено висоту динамічною на основі 1:1, 4:3 або 2:1 -->
+                        <div class="pt-[75%] relative overflow-hidden">
+                            <img src="${work.thumbnail}" alt="${work.title}" class="absolute inset-0 w-full h-full object-cover">
+                        </div>
+                        <div class="item-overlay absolute inset-0 bg-gray-900 bg-opacity-70 flex flex-col justify-end p-6 transition duration-500">
+                            <h4 class="text-xl font-bold text-white mb-2">${work.title}</h4>
+                            <p class="text-sm text-accent">${work.category}</p>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(item);
+            });
+        }
+
+        /**
+         * Створює кнопки тегів на основі наявних у даних.
+         */
+        function renderTagFilters() {
+            const tagContainer = document.getElementById('tag-filters');
+            const allTags = new Set();
+            worksData.forEach(work => work.tags.forEach(tag => allTags.add(tag)));
+            
+            tagContainer.innerHTML = '';
+            
+            allTags.forEach(tag => {
+                const tagClass = `.tag-${tag.toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
+                const button = document.createElement('button');
+                button.className = 'tag-btn bg-white text-gray-700 hover:bg-gray-200 px-4 py-1 rounded-full text-sm font-medium transition border border-gray-300';
+                button.setAttribute('data-filter', tagClass);
+                button.textContent = `#${tag}`;
+                button.onclick = () => toggleTagFilter(tagClass, button);
+                tagContainer.appendChild(button);
+            });
+        }
+        
+        /**
+         * Встановлює фільтр за категорією та оновлює UI.
+         */
+        function setCategoryFilter(filterValue) {
+            currentCategory = filterValue;
+            applyCombinedFilters();
+
+            // Оновлення активного стану кнопок категорій
+            document.querySelectorAll('#category-filters .filter-btn').forEach(btn => {
+                // Скинути стилі
+                btn.classList.remove('active', 'bg-gray-900', 'text-white', 'hover-accent');
+                btn.classList.add('bg-white', 'text-gray-700', 'hover:bg-gray-200');
+                
+                // Встановити активний стиль
+                if (btn.getAttribute('data-filter') === filterValue) {
+                    btn.classList.add('active', 'bg-gray-900', 'text-white', 'hover-accent');
+                    btn.classList.remove('bg-white', 'text-gray-700', 'hover:bg-gray-200');
+                }
+            });
+        }
+        
+        /**
+         * Додає/видаляє тег із масиву активних тегів.
+         */
+        function toggleTagFilter(tagClass, button) {
+            const index = activeTags.indexOf(tagClass);
+
+            if (index > -1) {
+                activeTags.splice(index, 1); 
+                button.classList.remove('active', 'bg-accent', 'text-white');
+                button.classList.add('bg-white', 'text-gray-700');
+            } else {
+                activeTags.push(tagClass); 
+                button.classList.add('active', 'bg-accent', 'text-white');
+                button.classList.remove('bg-white', 'text-gray-700');
+            }
+            
+            applyCombinedFilters();
+        }
+
+        /**
+         * Комбінує фільтри категорій та тегів і застосовує їх до Isotope.
+         */
+        function applyCombinedFilters() {
+            if (!iso) return; // Запобігання помилкам до ініціалізації
+            
+            let combinedFilter = currentCategory === '*' ? '' : currentCategory;
+            
+            if (activeTags.length > 0) {
+                // Об'єднання для логіки І
+                const tagFilterString = activeTags.join(''); 
+                
+                if (combinedFilter) {
+                    // Категорія І Теги
+                    combinedFilter += tagFilterString;
+                } else {
+                    // Тільки Теги
+                    combinedFilter = tagFilterString;
+                }
+            }
+            
+            if (combinedFilter === '') combinedFilter = '*'; 
+            
+            iso.arrange({ filter: combinedFilter });
+        }
+        
+        // --- ФУНКЦІЇ ДЛЯ LIGHTBOX ---
+
+        /**
+         * Відкриває модальне вікно Lightbox з деталями проекту.
+         */
+        function openLightbox(id) {
+            const work = worksData.find(w => w.id === id);
+            if (!work) return;
+
+            currentWorkId = id;
+
+            document.getElementById('lb-title').textContent = work.title;
+            document.getElementById('lb-description').textContent = work.description;
+            document.getElementById('lb-client').textContent = work.client;
+            document.getElementById('lb-year').textContent = work.year;
+            document.getElementById('lb-category').textContent = work.category;
+            document.getElementById('lb-results').textContent = work.results;
+            document.getElementById('lb-tags').textContent = work.tags.map(t => `#${t}`).join(' ');
+            document.getElementById('lightbox-image').src = work.image;
+            
+            document.getElementById('lb-link').href = `#contact?project=${encodeURIComponent(work.title)}`;
+
+            const lightbox = document.getElementById('lightbox');
+            lightbox.classList.remove('opacity-0', 'pointer-events-none');
+            document.getElementById('lightbox-content').classList.remove('scale-95');
+
+            document.addEventListener('keydown', handleLightboxKeydown);
+            
+            // Додаємо підтримку свайпу для мобільних
+            addSwipeListeners();
+        }
+
+        /**
+         * Закриває модальне вікно Lightbox.
+         */
+        function closeLightbox() {
+            const lightbox = document.getElementById('lightbox');
+            lightbox.classList.add('opacity-0', 'pointer-events-none');
+            document.getElementById('lightbox-content').classList.add('scale-95');
+            currentWorkId = null;
+            document.removeEventListener('keydown', handleLightboxKeydown);
+            removeSwipeListeners();
+        }
+        
+        /**
+         * Обробляє навігацію між проектами.
+         */
+        function navigateLightbox(direction) {
+            const currentIndex = worksData.findIndex(w => w.id === currentWorkId);
+            if (currentIndex === -1) return;
+
+            let nextIndex = currentIndex + direction;
+
+            // Циклічна навігація
+            if (nextIndex < 0) {
+                nextIndex = worksData.length - 1;
+            } else if (nextIndex >= worksData.length) {
+                nextIndex = 0;
+            }
+
+            openLightbox(worksData[nextIndex].id);
+        }
+        
+        /**
+         * Обробник подій клавіатури для Lightbox.
+         */
+        function handleLightboxKeydown(event) {
+            if (event.key === 'Escape') {
+                closeLightbox();
+            } else if (event.key === 'ArrowLeft') {
+                navigateLightbox(-1);
+            } else if (event.key === 'ArrowRight') {
+                navigateLightbox(1);
+            }
+        }
+
+        // --- ЛОГІКА СВАЙПУ ДЛЯ МОБІЛЬНИХ ---
+        let touchstartX = 0;
+
+        function handleTouchStart(e) {
+            touchstartX = e.changedTouches[0].screenX;
+        }
+
+        function handleTouchEnd(e) {
+            const touchendX = e.changedTouches[0].screenX;
+            const diff = touchendX - touchstartX;
+            const threshold = 50; // Мінімум пікселів для спрацювання
+
+            if (diff > threshold) {
+                // Свайп вправо (Попередній)
+                navigateLightbox(-1);
+            } else if (diff < -threshold) {
+                // Свайп вліво (Наступний)
+                navigateLightbox(1);
+            }
+        }
+        
+        function addSwipeListeners() {
+            const imgContainer = document.getElementById('lightbox-image-container');
+            imgContainer.addEventListener('touchstart', handleTouchStart);
+            imgContainer.addEventListener('touchend', handleTouchEnd);
+        }
+
+        function removeSwipeListeners() {
+             const imgContainer = document.getElementById('lightbox-image-container');
+            imgContainer.removeEventListener('touchstart', handleTouchStart);
+            imgContainer.removeEventListener('touchend', handleTouchEnd);
+        }
+        
+        /**
+         * Обробник кліку поза контентом Lightbox.
+         */
+        function handleLightboxClick(event) {
+            const lightbox = document.getElementById('lightbox');
+            // Перевіряємо, чи клік був саме по фону модального вікна
+            if (event.target === lightbox) {
+                closeLightbox();
+            }
+        }
+
+        // --- ФУНКЦІЇ ДЛЯ БАГАТОКРОКОВОЇ ФОРМИ ---
+
+        let briefStep = 1;
+        const briefData = {};
+
+        /**
+         * Переходить до наступного кроку форми.
+         */
+        function nextStep(currentStep) {
+            const currentStepEl = document.getElementById(`step-${currentStep}`);
+            const formMessage = document.getElementById('form-message');
+            formMessage.classList.add('hidden');
+
+            const isValid = validateStep(currentStep, currentStepEl);
+            if (!isValid) return;
+
+            saveStepData(currentStep);
+
+            if (briefStep < 3) {
+                briefStep++;
+                updateBriefUI(currentStepEl);
+            }
+        }
+
+        /**
+         * Переходить до попереднього кроку форми.
+         */
+        function prevStep(currentStep) {
+            const currentStepEl = document.getElementById(`step-${currentStep}`);
+            if (briefStep > 1) {
+                briefStep--;
+                updateBriefUI(currentStepEl);
+            }
+        }
+        
+        /**
+         * Валідує поля поточного кроку.
+         */
+        function validateStep(step, stepElement) {
+            const formMessage = document.getElementById('form-message');
+            formMessage.classList.add('hidden');
+
+            const showAlert = (message) => {
+                formMessage.textContent = message;
+                formMessage.classList.remove('hidden', 'bg-green-100', 'text-green-700');
+                formMessage.classList.add('bg-red-100', 'text-red-700');
+                // Використовуємо scrollTo, щоб повідомлення було видно
+                stepElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            };
+
+            if (step === 1) {
+                const selected = stepElement.querySelector('input[name="projectType"]:checked');
+                if (!selected) {
+                    showAlert('Будь ласка, виберіть тип проекту.');
+                    return false;
+                }
+            } else if (step === 2) {
+                const selected = stepElement.querySelector('input[name="budget"]:checked');
+                if (!selected) {
+                    showAlert('Будь ласка, виберіть очікуваний бюджет.');
+                    return false;
+                }
+            } else if (step === 3) {
+                const nameInput = document.getElementById('contactName');
+                const emailInput = document.getElementById('contactEmail');
+                
+                if (!nameInput.value || !emailInput.value) {
+                    showAlert('Будь ласка, заповніть Ім\'я та Email.');
+                    return false;
+                }
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(emailInput.value)) {
+                    showAlert('Будь ласка, введіть коректний Email.');
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        /**
+         * Зберігає дані поточного кроку у стані `briefData`.
+         */
+        function saveStepData(step) {
+            const form = document.getElementById('briefForm');
+            if (step === 1) {
+                briefData.projectType = form.querySelector('input[name="projectType"]:checked')?.value || null;
+            } else if (step === 2) {
+                briefData.budget = form.querySelector('input[name="budget"]:checked')?.value || null;
+            } else if (step === 3) {
+                briefData.contactName = document.getElementById('contactName').value;
+                briefData.contactEmail = document.getElementById('contactEmail').value;
+                briefData.details = document.getElementById('details').value;
+            }
+        }
+
+        /**
+         * Оновлює видимість кроків та індикатори прогресу.
+         */
+        function updateBriefUI(oldStepElement) {
+            const newStepEl = document.getElementById(`step-${briefStep}`);
+            
+            // Оновлення індикаторів
+            for (let i = 1; i <= 3; i++) {
+                const indicator = document.getElementById(`step-indicator-${i}`);
+                if (i <= briefStep) {
+                    indicator.classList.remove('bg-gray-300', 'text-gray-500');
+                    indicator.classList.add('bg-accent', 'text-white');
+                } else {
+                    indicator.classList.remove('bg-accent', 'text-white');
+                    indicator.classList.add('bg-gray-300', 'text-gray-500');
+                }
+            }
+
+            // Перемикання видимості кроків
+            if (oldStepElement) oldStepElement.classList.remove('active-step');
+            if (newStepEl) newStepEl.classList.add('active-step');
+        }
+
+        /**
+         * Фінальна відправка форми.
+         */
+        function submitBrief() {
+            const step3El = document.getElementById('step-3');
+            if (!validateStep(3, step3El)) return;
+
+            saveStepData(3);
+            
+            const formMessage = document.getElementById('form-message');
+            
+            console.log('Бриф відправлено:', briefData);
+
+            // Відображення успіху
+            formMessage.textContent = 'Дякуємо! Ваш бриф успішно надіслано. Ми зв\'яжемося з вами найближчим часом.';
+            formMessage.classList.remove('hidden', 'bg-red-100', 'text-red-700');
+            formMessage.classList.add('bg-green-100', 'text-green-700');
+            
+            // Скидання форми та повернення до кроку 1
+            setTimeout(() => {
+                // Скидання полів форми
+                document.getElementById('briefForm').reset(); 
+                
+                // Перемикання кроків
+                const currentActive = document.querySelector('.brief-step.active-step');
+                briefStep = 1;
+                updateBriefUI(currentActive);
+                
+                formMessage.classList.add('hidden');
+            }, 3000); 
+        }
+
+
+        // --- ФУНКЦІЇ ДЛЯ SCROLL ANIMATIONS ---
+
+        /**
+         * Ініціалізація Intersection Observer для анімацій.
+         */
+        function initializeScrollAnimations() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animate-fadeInUp');
+                        // Встановлюємо затримку для наступних елементів (Staggered animation)
+                        const delay = entry.target.dataset.delay || 0;
+                        setTimeout(() => {
+                           entry.target.classList.add('animate-fadeInUp');
+                        }, delay);
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { 
+                threshold: 0.1, 
+                rootMargin: '0px 0px -50px 0px' 
+            });
+
+            document.querySelectorAll('.animate-on-scroll').forEach((element, index) => {
+                // Додаємо затримку, щоб елементи з'являлися послідовно
+                element.dataset.delay = index * 100; 
+                observer.observe(element);
+            });
+        }
+        
+        // --- ЗАГАЛЬНА ІНІЦІАЛІЗАЦІЯ ---
+        window.onload = function() {
+            // 1. Ініціалізація Портфоліо та Фільтрів
+            initializePortfolio();
+            
+            // 2. Додавання обробників кліків для категорій
+            document.querySelectorAll('#category-filters .filter-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    setCategoryFilter(button.getAttribute('data-filter'));
+                });
+            });
+
+            // 3. Обробник для закриття Lightbox кліком поза контентом
+            document.getElementById('lightbox').addEventListener('click', handleLightboxClick);
+
+            // 4. Ініціалізація анімацій при скролі
+            initializeScrollAnimations();
+        };
+
+    </script>
+</body>
+</html>
